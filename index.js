@@ -6,7 +6,10 @@ function parse(text) {
 		lastKey = null;
 	for (var i = 0; i < pieces.length; i++) {
 		var piece = pieces[i] || '';
-		if (piece == '---') {
+		if (piece == '----') {
+			// remove last \n since a divider is made of \n---\n
+			if( results[lastKey] !== undefined && results[lastKey].substring(results[lastKey].length-1) === '\n')
+				results[lastKey] = results[lastKey].slice(0, -1);
 			lastKey = null;
 			continue;
 		}

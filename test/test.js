@@ -60,19 +60,19 @@ describe('Properties', function() {
 		expect(param.camelCase).to.equal('test');
 	});
 
-	it('should remove --- dividers', function() {
-		var param = parsedown('first: value1\n---\nsecond:value2');
+	it('should remove ---- dividers', function() {
+		var param = parsedown('first: value1\n----\nsecond:value2');
 		expect(param.first).to.equal('value1');
 		expect(param.second).to.equal('value2');
 	});
 
-	it('should swallow line breaks after --- dividers', function() {
-		var param = parsedown('---\n');
+	it('should swallow line breaks after ---- dividers', function() {
+		var param = parsedown('----\n');
 		expect(param.content).to.equal('');
 	});
 
-	it('should swallow multiple line breaks after --- dividers', function() {
-		var param = parsedown('---\n\n');
+	it('should swallow multiple line breaks after ---- dividers', function() {
+		var param = parsedown('----\n\n');
 		expect(param.content).to.equal('');
 	});
 
@@ -101,9 +101,26 @@ describe('Properties', function() {
 	});
 
 
-	it('lastKey should be nullified after --- divider, leading to next content without a property name to be placed inside content', function() {
-		var param = parsedown('test:test\n---\nblabla');
+	it('lastKey should be nullified after ---- divider, leading to next content without a property name to be placed inside content', function() {
+		var param = parsedown('test:test\n----\nblabla');
 		expect(param['test']).to.equal('test');
 		expect(param.content).to.equal('blabla');
 	});
+
+	it('Typical txt values', function() {
+		var param = parsedown('name: Hello world\n\n----\n\ncreated: 20160522_232028\n\n----\n\nmodified: 20160522_232028\n\n----\n\nstatut: en cours\n\n----');
+		expect(param.name).to.equal('Hello world');
+		expect(param.created).to.equal('20160522_232028');
+		expect(param.modified).to.equal('20160522_232028');
+		expect(param.statut).to.equal('en cours');
+	});
+
+	it('With irregular returns around divider', function() {
+		var param = parsedown('name: Hello world\n----\n\ncreated: 20160522_232028\n\n----\nmodified: 20160522_232028\n----\nstatut: en cours\n\n----');
+		expect(param.name).to.equal('Hello world');
+		expect(param.created).to.equal('20160522_232028');
+		expect(param.modified).to.equal('20160522_232028');
+		expect(param.statut).to.equal('en cours');
+	});
+
 });
