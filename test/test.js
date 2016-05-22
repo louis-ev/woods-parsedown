@@ -14,34 +14,28 @@ function parseFile(file) {
 
 describe('Properties', function() {
 	it('should convert lines starting with word+: to properties', function() {
-		var param = parsedown('---\ntest:test test');
+		var param = parsedown('test:test test');
 		expect(param.test).to.equal('test test');
-		expect(param.content).equal('');
+		expect(param.content).to.be.undefined;
 	});
 
 	it('should put all text into content property if there are no properties present', function() {
 		var param = parsedown('test test');
 		expect(param.content).to.equal('test test');
-
-		param = parsedown('test test\nmoreLines');
-		expect(param.content).to.equal('test test\nmoreLines');
-
-		param = parsedown('test test\nmoreLines\n--');
-		expect(param.content).to.equal('test test\nmoreLines\n--');
 	});
 
 	it('should preserve linebreaks', function() {
-		var param = parsedown('---\ntest:test test\ntest');
+		var param = parsedown('test:test test\ntest');
 		expect(param.test).to.equal('test test\ntest');
 	});
 
-	it('should remove trailing linebreaks', function() {
-		var param = parsedown('---\ntest: test test\n');
-		expect(param.test).to.equal('test test');
+	it('should preserve trailing linebreaks', function() {
+		var param = parsedown('test:test test\n');
+		expect(param.test).to.equal('test test\n');
 	});
 
 	it('should preserve double linebreaks', function() {
-		var param = parsedown('---\ntest:test test\n\ntest');
+		var param = parsedown('test:test test\n\ntest');
 		expect(param.test).to.equal('test test\n\ntest');
 	});
 
@@ -52,18 +46,24 @@ describe('Properties', function() {
 	});
 
 	it('should allow numbers in property keys', function() {
-		var param = parsedown('---\ntest123:test');
+		var param = parsedown('test123:test');
 		expect(param.test123).to.equal('test');
 	});
 
 	it('should allow underscores in property keys', function() {
-		var param = parsedown('---\ntest_123:test');
+		var param = parsedown('test_123:test');
 		expect(param.test_123).to.equal('test');
 	});
 
 	it('should allow capital letters in property keys', function() {
-		var param = parsedown('---\ncamelCase:test');
+		var param = parsedown('camelCase:test');
 		expect(param.camelCase).to.equal('test');
+	});
+
+	it('should remove --- dividers', function() {
+		var param = parsedown('first: value1\n---\nsecond:value2');
+		expect(param.first).to.equal('value1');
+		expect(param.second).to.equal('value2');
 	});
 
 	it('should swallow line breaks after --- dividers', function() {
@@ -77,43 +77,33 @@ describe('Properties', function() {
 	});
 
 	it('should swallow line breaks directly after a property name', function() {
-		var param = parsedown('---\ntest:\ntest');
+		var param = parsedown('test:\ntest');
 		expect(param.test).to.equal('test');
 	});
 
 	it('should swallow spaces directly after a property name', function() {
-		var param = parsedown('---\ntest: testing');
+		var param = parsedown('test: testing');
 		expect(param.test).to.equal('testing');
 
-		param = parsedown('---\ntest:       testing');
+		param = parsedown('test:       testing');
 		expect(param.test).to.equal('testing');
 	});
 
 	it('should swallow line-breaks & spaces directly after a property name', function() {
-		var param = parsedown('---\ntest:       \n\ntesting');
+		var param = parsedown('test:       \n\ntesting');
 		expect(param.test).to.equal('testing');
 	});
 
 	it('should ignore spaces in property keys', function() {
-		var param = parsedown('---\n test:test\nsecond:value');
+		var param = parsedown(' test:test');
 		expect(param['test']).to.be.undefined;
-		expect(param['second']).to.equal('value');
+		expect(param.content).to.equal(' test:test');
 	});
 
+
 	it('lastKey should be nullified after --- divider, leading to next content without a property name to be placed inside content', function() {
-		var param = parsedown('---\ntest:test\n---\nblabla');
+		var param = parsedown('test:test\n---\nblabla');
 		expect(param['test']).to.equal('test');
 		expect(param.content).to.equal('blabla');
 	});
-
-	it('should only parse properties in the first --- block', function() {
-		var param = parsedown('---\nfirst: value1\n---\nsecond:value2');
-		expect(param.first).to.equal('value1');
-		expect(param.content).to.equal('second:value2');
-
-		param = parsedown('---\nfirst: value1\n---\nsecond:value2\n---\nsomemore');
-		expect(param.first).to.equal('value1');
-		expect(param.content).to.equal('second:value2\n---\nsomemore');
-	});
-	
 });
