@@ -72,6 +72,12 @@ describe('Properties', function() {
 		expect(param.second).to.equal('value2');
 	});
 
+	it('shouldn\'t read lines starting with ----something as dividers', function() {
+		var param = parsedown('first: value1\n----Still value\n----\nsecond: value2');
+		expect(param.first).to.equal('value1\n----Still value');
+		expect(param.second).to.equal('value2');
+	});
+
 	it('should swallow line breaks after ---- dividers', function() {
 		var param = parsedown('----\n');
 		expect(param.content).to.equal('');
