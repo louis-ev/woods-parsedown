@@ -66,6 +66,12 @@ describe('Properties', function() {
 		expect(param.second).to.equal('value2');
 	});
 
+	it('should prevent "space"---- to be interpreted as a divider', function() {
+		var param = parsedown('first: value1\n ----\nStill value\n----\nsecond: value2');
+		expect(param.first).to.equal('value1\n ----\nStill value');
+		expect(param.second).to.equal('value2');
+	});
+
 	it('should swallow line breaks after ---- dividers', function() {
 		var param = parsedown('----\n');
 		expect(param.content).to.equal('');
