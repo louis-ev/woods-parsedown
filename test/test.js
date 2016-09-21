@@ -135,4 +135,13 @@ describe('Properties', function() {
 		expect(param.statut).to.equal('en cours');
 	});
 
+	it('With YAML-like field info', function() {
+		var param = parsedown('name: première publi\n\n----\n\ninformations: Mes informations\n\n----\n\nmedias:\n\n-\nname: 02-animations/20160920_171027.txt\n-\nname: 02-animations/20160920_171029.txt\nlargeur: 100%\n-\nname: 02-animations/20160920_171027.txt\n\n----\n\n');
+		expect(param.name).to.equal('première publi');
+		expect(param.informations).to.equal('Mes informations');
+		expect(param.medias[0].name).to.equal('02-animations/20160920_171027.txt');
+		expect(param.medias[1].name).to.equal('02-animations/20160920_171029.txt');
+		expect(param.medias[1].largeur).to.equal('100%');
+	});
+
 });
